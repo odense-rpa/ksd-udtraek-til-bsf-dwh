@@ -186,7 +186,7 @@ wheels = [
 [[package]]
 name = "ksd"
 version = "0.1.0"
-source = { git = "https://github.com/odense-rpa/ksd.git#e7eb2db00f771a5bd5253a88460352f7a9c03c96" }
+source = { git = "https://github.com/odense-rpa/ksd.git#176e7b34fa9d8eb16b45352375cece27bcc0db25" }
 dependencies = [
     { name = "dotenv" },
     { name = "playwright" },

@@ -107,7 +107,7 @@ async def populate_queue(workqueue: Workqueue):
 def process_workqueue(workqueue: Workqueue):
     logger = logging.getLogger(__name__)
 
-    with ksd_client:
+    with ksd_client:        
         ksd_client.login()
 
         for item in workqueue:
