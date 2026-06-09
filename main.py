@@ -169,6 +169,8 @@ def process_workqueue(workqueue: Workqueue):
                         },
                     )                    
                     item.fail(str(e))
+                    # Force restart the worker
+                    raise
                 finally:
                     ksd_client._luk_tabs()
                     if path and os.path.exists(path):
