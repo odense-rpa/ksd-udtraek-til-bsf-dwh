@@ -159,6 +159,16 @@ def process_workqueue(workqueue: Workqueue):
                     )
                     logger.error(f"XML parse error for item: {data}. Error: {e}")
                     item.fail(str(e))
+                except Exception as e:
+                    report(
+                        report_id="ksd_udtraek_til_bsf_dwh",
+                        group="Fejl",
+                        json={
+                            "Cpr": data.get("Cpr", "Uden Cpr"),
+                            "Fejl": f"Uventet fejl: {str(e)}",
+                        },
+                    )                    
+                    item.fail(str(e))
                 finally:
                     ksd_client._luk_tabs()
                     if path and os.path.exists(path):
