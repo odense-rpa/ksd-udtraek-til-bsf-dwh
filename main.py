@@ -2,6 +2,7 @@ import argparse
 import asyncio
 import logging
 import os
+from datetime import datetime
 import sys
 import unicodedata
 import xml.etree.ElementTree as ET
@@ -82,9 +83,34 @@ def _extract_xml_values(xml_content: str) -> Dict[str, str]:
     return values
 
 
+def _format_date_ddmmyyyy(value: str) -> str:
+    """Convert common date/datetime formats to dd-mm-yyyy."""
+    raw = value.strip()
+    if not raw:
+        return ""
+
+    # Support ISO timestamps with UTC marker.
+    candidate = raw.replace("Z", "+00:00")
+    try:
+        return datetime.fromisoformat(candidate).strftime("%d-%m-%Y")
+    except ValueError:
+        pass
+
+    for fmt in ("%d-%m-%Y", "%d/%m/%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(raw, fmt).strftime("%d-%m-%Y")
+        except ValueError:
+            continue
+
+    if len(raw) >= 10 and raw[4] == "-" and raw[7] == "-":
+        return f"{raw[8:10]}-{raw[5:7]}-{raw[0:4]}"
+
+    return ""
+
+
 def _build_report_payload(data: dict, xml_content: str) -> Dict[str, str | None]:
     xml_values = _extract_xml_values(xml_content)
-    payload: Dict[str, str | None] = {field: None for field in EXPECTED_REPORT_FIELDS}
+    payload: Dict[str, str | None] = {field: "" for field in EXPECTED_REPORT_FIELDS}
 
     # Queue data is authoritative for CPR if present.
     payload["Cpr"] = data.get("Cpr")
@@ -93,6 +119,8 @@ def _build_report_payload(data: dict, xml_content: str) -> Dict[str, str | None]
         normalized_field = _normalize_name(field)
         if normalized_field in xml_values:
             payload[field] = xml_values[normalized_field]
+
+    payload["AfsendtDato"] = _format_date_ddmmyyyy(payload.get("AfsendtDato") or "")
 
     return payload
 
