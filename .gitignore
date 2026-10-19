@@ -1,3 +1,7 @@
 .venv
 .env
 /input/
+
+# Python-cachefiler
+__pycache__/
+*.py[cod]
